@@ -611,6 +611,35 @@
   .toast.success{border-color:rgba(16,185,129,0.3);color:var(--success)}
   .toast.error{border-color:rgba(239,68,68,0.3);color:var(--danger)}
 
+  /* API KEY BANNER */
+  .api-key-banner{
+    background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);
+    border-radius:14px;padding:18px 20px;margin-bottom:20px;
+  }
+  .api-key-banner h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--warn);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .api-key-banner p{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:12px}
+  .api-key-row{display:flex;gap:8px}
+  .api-key-input{
+    flex:1;padding:10px 14px;border-radius:8px;
+    background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+    outline:none;transition:border-color .2s;
+  }
+  .api-key-input:focus{border-color:var(--warn)}
+  .api-key-btn{
+    padding:10px 16px;border-radius:8px;
+    background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);
+    color:var(--warn);font-size:13px;font-weight:600;cursor:pointer;
+    white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif;
+  }
+  .api-key-btn:hover{background:var(--warn);color:#000}
+  .api-key-connected{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 14px;border-radius:8px;
+    background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);
+    color:var(--success);font-size:13px;font-weight:600;
+  }
+
   /* SCROLLBAR */
   ::-webkit-scrollbar{width:6px}
   ::-webkit-scrollbar-track{background:transparent}
@@ -640,10 +669,10 @@
     MediAI
   </a>
   <div class="nav-links">
-    <button class="nav-link" onclick="scrollTo('#checker')">Symptom Check</button>
-    <button class="nav-link" onclick="scrollTo('#hospitals')">Hospitals</button>
-    <button class="nav-link" onclick="scrollTo('#aichat')">AI Doctor</button>
-    <button class="nav-cta" onclick="scrollTo('#checker')">Get Diagnosis →</button>
+    <button class="nav-link" onclick="goTo('#checker')">Symptom Check</button>
+    <button class="nav-link" onclick="goTo('#hospitals')">Hospitals</button>
+    <button class="nav-link" onclick="goTo('#aichat')">AI Doctor</button>
+    <button class="nav-cta" onclick="goTo('#checker')">Get Diagnosis →</button>
   </div>
 </nav>
 
@@ -657,8 +686,8 @@
     <h1>Your Intelligent<br><span class="grad">Health Assistant</span></h1>
     <p class="hero-sub">Advanced AI analyzes your symptoms and predicts possible conditions with doctor recommendations and hospital guidance across India.</p>
     <div class="hero-actions">
-      <button class="btn-primary" onclick="scrollTo('#checker')">🔍 Check Symptoms Now</button>
-      <button class="btn-secondary" onclick="scrollTo('#aichat')">💬 Chat with AI Doctor</button>
+      <button class="btn-primary" onclick="goTo('#checker')">🔍 Check Symptoms Now</button>
+      <button class="btn-secondary" onclick="goTo('#aichat')">💬 Chat with AI Doctor</button>
     </div>
     <div class="stats-row">
       <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Conditions Covered</div></div>
@@ -816,23 +845,33 @@
       <h2 class="section-title">Chat with AI Doctor</h2>
       <p class="section-sub" style="margin:0 auto">Get instant medical guidance from our AI — available 24/7.</p>
     </div>
+    <!-- API KEY SETUP -->
+    <div class="api-key-banner" id="apiKeyBanner">
+      <h4>🔑 Connect Anthropic API Key to Enable Live AI Chat</h4>
+      <p>Enter your Anthropic API key below. It stays in your browser only — never sent anywhere except Anthropic's servers directly. Get a free key at <strong>console.anthropic.com → API Keys</strong></p>
+      <div class="api-key-row" id="apiKeyRow">
+        <input type="password" id="apiKeyInput" class="api-key-input" placeholder="sk-ant-api03-..." />
+        <button class="api-key-btn" onclick="saveApiKey()">Connect →</button>
+      </div>
+    </div>
+
     <div class="chat-wrap">
       <div class="chat-header">
         <div class="chat-ai-avatar">🤖</div>
         <div class="chat-ai-info">
           <div class="name">Dr. MediAI</div>
-          <div class="status"><div class="pulse-dot"></div> Online — Powered by Claude AI</div>
+          <div class="status" id="chatStatus"><div class="pulse-dot" style="background:var(--warn)"></div> Connect API key above to activate</div>
         </div>
       </div>
       <div class="chat-messages" id="chatMessages">
         <div class="chat-msg ai">
           <div class="msg-avatar">🤖</div>
-          <div class="msg-bubble">👋 Hello! I'm Dr. MediAI, your intelligent health assistant. I can help you understand symptoms, explain medical conditions, suggest precautions, and guide you to the right specialists.<br><br>What health concern can I help you with today?</div>
+          <div class="msg-bubble">👋 Hello! I'm Dr. MediAI, your intelligent health assistant.<br><br>I can help you understand symptoms, explain conditions, suggest precautions, and guide you to specialists.<br><br>🔑 <strong>Enter your Anthropic API key above</strong> to start chatting live!<br><br>No key? Use the <strong>Symptom Checker above</strong> — it works 100% without any key!</div>
         </div>
       </div>
       <div class="chat-input-area">
-        <input type="text" id="chatInput" class="chat-input" placeholder="Ask about any symptom, condition, or health question..." onkeydown="if(event.key==='Enter')sendChat()" />
-        <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">➤</button>
+        <input type="text" id="chatInput" class="chat-input" placeholder="Connect your API key above to start chatting..." onkeydown="if(event.key==='Enter')sendChat()" disabled />
+        <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()" disabled>➤</button>
       </div>
     </div>
   </section>
@@ -1562,7 +1601,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-function scrollTo(sel){
+function goTo(sel){
   document.querySelector(sel)?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -1739,7 +1778,7 @@ function renderResults(results){
   
   html+=`<div class="specialist-section">
     <div class="specialist-title">👨‍⚕️ Recommended Specialists for Top Condition</div>
-    ${doctors.map(d=>`
+    ${doctors.map((d,i)=>`
       <div class="specialist-card">
         <div class="doc-avatar">👨‍⚕️</div>
         <div class="doc-info">
@@ -1748,7 +1787,7 @@ function renderResults(results){
           <div class="doc-hospital">🏥 ${d.hospital}</div>
           <div class="doc-rating">${'★'.repeat(Math.floor(d.rating))} ${d.rating} · ${d.exp} · ${d.availability}</div>
         </div>
-        <button class="book-btn" onclick='openAppointment(${JSON.stringify(d)})'>Book</button>
+        <button class="book-btn" onclick="openAppointmentByKey('${specKey}',${i})">Book</button>
       </div>`).join('')}
   </div>`;
 
@@ -1785,7 +1824,7 @@ function renderHospitals(filterCity=''){
         <div class="h-stat"><strong>${h.rating} ⭐</strong>Rating</div>
         <div class="h-stat"><strong>${h.specialties.length}+</strong>Depts</div>
       </div>
-      <button class="hospital-btn" onclick="openHospitalAppointment('${h.name}','${h.city}')">🗓️ Book Appointment</button>
+      <button class="hospital-btn" onclick="openHospitalAppt('${h.name}','${h.city}')">🗓️ Book Appointment</button>
     </div>`).join('');
 }
 
@@ -1797,6 +1836,18 @@ function filterHospitals(){
 // ============================================================
 // APPOINTMENT MODAL
 // ============================================================
+function openAppointmentByKey(specKey, idx){
+  const docs = DOCTORS[specKey] || DOCTORS['Internal Medicine'] || [];
+  const doctor = docs[idx];
+  if(!doctor){ showToast('Doctor info not found','error'); return; }
+  openAppointment(doctor);
+}
+
+function openAppointmentByIdx(i){
+  const doc = (window._currentDocs||[])[i];
+  if(!doc){showToast('Doctor not found','error');return;}
+  openAppointment(doc);
+}
 function openAppointment(doctor){
   currentAppointmentData = doctor;
   selectedTimeSlot = null;
@@ -1846,7 +1897,7 @@ function openAppointment(doctor){
   document.getElementById('appointmentModal').classList.remove('hidden');
 }
 
-function openHospitalAppointment(name,city){
+function openHospitalAppt(name,city){
   currentAppointmentData = {name:'General Physician',spec:'Multi-Specialty',hospital:name+', '+city};
   openAppointment(currentAppointmentData);
 }
@@ -1887,11 +1938,56 @@ async function submitAppointment(){
 }
 
 // ============================================================
-// AI CHAT (Live — calls Anthropic API)
+// AI CHAT — API KEY MANAGEMENT + LIVE CHAT
 // ============================================================
 let chatHistory = [];
+let ANTHROPIC_API_KEY = localStorage.getItem('mediai_apikey') || '';
+
+function saveApiKey(){
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if(!key || !key.startsWith('sk-ant')){
+    showToast('Please enter a valid Anthropic API key (starts with sk-ant...)','error');
+    return;
+  }
+  ANTHROPIC_API_KEY = key;
+  localStorage.setItem('mediai_apikey', key);
+  activateChat();
+}
+
+function activateChat(){
+  document.getElementById('apiKeyRow').innerHTML = `
+    <div class="api-key-connected">✅ API Key Connected — AI Chat is Live!</div>
+    <button class="api-key-btn" style="margin-left:8px" onclick="disconnectKey()">Disconnect</button>`;
+  document.getElementById('chatInput').disabled = false;
+  document.getElementById('chatSendBtn').disabled = false;
+  document.getElementById('chatInput').placeholder = 'Ask about any symptom, condition, or health question...';
+  document.getElementById('chatStatus').innerHTML = '<div class="pulse-dot"></div> Online — Powered by Claude AI';
+  showToast('AI Doctor is now live! Ask anything 🎉','success');
+}
+
+function disconnectKey(){
+  ANTHROPIC_API_KEY = '';
+  localStorage.removeItem('mediai_apikey');
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiKeyRow').innerHTML = `
+    <input type="password" id="apiKeyInput" class="api-key-input" placeholder="sk-ant-api03-..." />
+    <button class="api-key-btn" onclick="saveApiKey()">Connect →</button>`;
+  document.getElementById('chatInput').disabled = true;
+  document.getElementById('chatSendBtn').disabled = true;
+  document.getElementById('chatInput').placeholder = 'Connect your API key above to start chatting...';
+  document.getElementById('chatStatus').innerHTML = '<div class="pulse-dot" style="background:var(--warn)"></div> Connect API key above to activate';
+}
+
+// Auto-restore saved key on load
+if(ANTHROPIC_API_KEY){
+  setTimeout(()=>{
+    document.getElementById('apiKeyInput').value = ANTHROPIC_API_KEY;
+    activateChat();
+  },300);
+}
 
 async function sendChat(){
+  if(!ANTHROPIC_API_KEY){ showToast('Please connect your API key first','error'); return; }
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if(!msg)return;
@@ -1907,32 +2003,29 @@ async function sendChat(){
   try{
     const res = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:`You are Dr. MediAI, an expert AI medical assistant. You provide helpful, accurate, and empathetic medical information. 
-
-Guidelines:
-- Provide clear, practical medical information
-- Always recommend seeing a doctor for diagnosis/treatment
-- For emergencies (chest pain, stroke symptoms, severe bleeding), immediately advise calling 112
-- Mention Indian healthcare resources when relevant
-- Keep responses concise but thorough (150-250 words)
-- Use medical terms with simple explanations
-- Never provide prescriptions
-- Always end with a reassuring note
-
-You have deep knowledge of: diseases, symptoms, medications, prevention, specialist recommendations, and Indian hospitals.`,
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:800,
+        system:'You are Dr. MediAI, an expert AI medical assistant for India. Provide helpful, accurate, empathetic medical information. Always recommend seeing a real doctor for diagnosis. For emergencies advise calling 112 immediately. Keep responses under 200 words. Use simple language with medical terms explained. Never prescribe medication.',
         messages:chatHistory.slice(-10)
       })
     });
     const data = await res.json();
-    const reply = data.content?.map(b=>b.type==='text'?b.text:'').join('') || "I'm having trouble connecting. Please try again.";
-    updateChatMsg(typingId, reply);
-    chatHistory.push({role:'assistant',content:reply});
+    if(data.error){
+      updateChatMsg(typingId,'⚠️ API Error: '+data.error.message+'. Please check your API key.');
+    } else {
+      const reply = data.content?.map(b=>b.type==='text'?b.text:'').join('') || "I'm having trouble. Please try again.";
+      updateChatMsg(typingId, reply);
+      chatHistory.push({role:'assistant',content:reply});
+    }
   }catch(e){
-    updateChatMsg(typingId,"I'm temporarily offline. Please try again or use the Symptom Checker above.");
+    updateChatMsg(typingId,'⚠️ Connection error. Check your API key and internet connection, then try again.');
   }
   sendBtn.disabled=false;
   input.focus();
